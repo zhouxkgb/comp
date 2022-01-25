@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Divider, Modal, Input, Button } from "antd";
 
 const data = [
@@ -62,20 +62,29 @@ function StepTable() {
     const handleOk = () => {
 
         if (dataSource[curIndex].stepNo === dataSource[curIndex + 1]?.stepNo) {
-            const addArr = addStep.split('/n').map(val => ({
+            const addArr = addStep.split('\n').map(val => ({
                 key: val,
                 stepNo: dataSource[curIndex].stepNo,
                 stepDesc: val
             }))
-            setDataSource(pre => {
-                pre.splice(curIndex + 1, 0, ...addArr)
-                return pre
-            })
+            setDataSource([...dataSource.slice(0, curIndex + 1), ...addArr, ...dataSource.slice(curIndex + 1)])
         } else {
-            setDataSource()
+            const addArr = addStep.split('\n').map((val, index) => ({
+                key: val,
+                stepNo: +dataSource[curIndex].stepNo + index + 1,
+                stepDesc: val
+            }))
+            console.log(addArr)
+            const tail = dataSource.slice(curIndex + 1).map((item, index) => ({
+                key: item.key,
+                stepNo: +addArr.at(-1).stepNo + 1 + index,
+                stepDesc: item.stepDesc
+            }))
+            setDataSource([...dataSource.slice(0, curIndex + 1), ...addArr, ...tail])
         }
         setVisible(false)
     }
+
     const handleCancel = () => { setVisible(false) }
     const [visible, setVisible] = useState(false)
 
