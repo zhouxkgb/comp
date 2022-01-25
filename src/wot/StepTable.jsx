@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Divider, Modal, Input } from "antd";
+import { Table, Divider, Modal, Input, Button } from "antd";
 
 const data = [
     {
@@ -12,7 +12,7 @@ const data = [
         stepDesc: '西湖区湖底公园2号',
     }, {
         key: '3',
-        stepNo: '3',
+        stepNo: '2',
         stepDesc: '西湖区湖底公园3号',
     },
 ];
@@ -20,9 +20,10 @@ const data = [
 function StepTable() {
     const [dataSource, setDataSource] = useState(data);
 
-    const handlInsert = (e) => {
-        e.preventDefault();
+    const handleInsert = (index) => {
+        window.event.preventDefault();
         setVisible(true)
+        setCurIndex(index)
     }
 
     const columns = [
@@ -42,30 +43,44 @@ function StepTable() {
         }, {
             title: '操作',
             dataIndex: 'action',
-            key: 'aciton',
+            key: 'action',
             render: (text, record, index) => {
                 return <>
-                    <a href="" onClick={handlInsert}>该行后插入</a>
+                    <Button onClick={() => handleInsert(index)}>该行后插入</Button>
+                    {/* <Divider type="vertical" />
+                    <Button>更新步序</Button>
                     <Divider type="vertical" />
-                    <a href="#">更新步序</a>
+                    <Button>删除</Button> */}
                 </>
             }
         }
     ];
 
-    const handleOk = () => {
-        // if (dataSource[index].stepNo === dataSource[index + 1]?.stepNo) {
-        //     setDataSource()
-        // } else {
-        //     setDataSource()
-        // }
+    const [curIndex, setCurIndex] = useState(-1)
+    const [addStep, setAddStep] = useState('')
 
+    const handleOk = () => {
+
+        if (dataSource[curIndex].stepNo === dataSource[curIndex + 1]?.stepNo) {
+            const addArr = addStep.split('/n').map(val => ({
+                key: val,
+                stepNo: dataSource[curIndex].stepNo,
+                stepDesc: val
+            }))
+            setDataSource(pre => {
+                pre.splice(curIndex + 1, 0, ...addArr)
+                return pre
+            })
+        } else {
+            setDataSource()
+        }
+        setVisible(false)
     }
     const handleCancel = () => { setVisible(false) }
     const [visible, setVisible] = useState(false)
 
     return (
-        <div style={{ width: '500px' }}>
+        <div style={{ width: '600px' }}>
             <Table
                 dataSource={dataSource}
                 columns={columns}
@@ -77,7 +92,7 @@ function StepTable() {
                 onOk={handleOk}
                 onCancel={handleCancel}
             >
-                <Input.TextArea rows={6}></Input.TextArea>
+                <Input.TextArea rows={6} value={addStep} onChange={e => setAddStep(e.target.value)}></Input.TextArea>
             </Modal>
         </div>
     )
