@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Table, Divider, Modal, Input, Button } from "antd";
 
 const data = [
@@ -14,6 +14,14 @@ const data = [
         key: '3',
         stepNo: '2',
         stepDesc: '西湖区湖底公园3号',
+    }, {
+        key: '4',
+        stepNo: '3',
+        stepDesc: '西湖区湖底公园4号',
+    }, {
+        key: '5',
+        stepNo: '4',
+        stepDesc: '西湖区湖底公园5号',
     },
 ];
 
@@ -74,13 +82,22 @@ function StepTable() {
                 stepNo: +dataSource[curIndex].stepNo + index + 1,
                 stepDesc: val
             }))
-            console.log(addArr)
-            const tail = dataSource.slice(curIndex + 1).map((item, index) => ({
+            let num = 1
+            const tails = dataSource.slice(curIndex + 1).map((item, index, tail) => ({
                 key: item.key,
-                stepNo: +addArr.at(-1).stepNo + 1 + index,
-                stepDesc: item.stepDesc
+                stepDesc: item.stepDesc,
+                stepNo: (function () {
+                    if (index === 0) {
+                        return +addArr.at(-1).stepNo + 1
+                    }
+                    if (tail[index].stepNo === tail[index - 1].stepNo) {
+                        return +tail[index - 1].stepNo + num
+                    }
+                    num++
+                    return +tail[index - 1].stepNo + num
+                })(index),
             }))
-            setDataSource([...dataSource.slice(0, curIndex + 1), ...addArr, ...tail])
+            setDataSource([...dataSource.slice(0, curIndex + 1), ...addArr, ...tails])
         }
         setVisible(false)
     }
